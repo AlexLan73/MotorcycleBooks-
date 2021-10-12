@@ -2,7 +2,8 @@ classdef LoadDan  < handle
     
     properties
         XYZ, XYZg, Engine, Frc, muRoad, Speed, Time, vBelt
-   end
+    end
+    
     
     methods
          function obj =  LoadDan(workDir, namefile)
@@ -17,7 +18,10 @@ classdef LoadDan  < handle
                 obj.Speed = DanConvert.speed;
                 obj.Time = DanConvert.Time;
                 obj.vBelt = DanConvert.vBelt;
+            else
+                disp(" Not file "+pathfile)
             end
+            
             
          end        
         
