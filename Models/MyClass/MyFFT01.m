@@ -1,19 +1,17 @@
 classdef MyFFT01  < handle
     properties
-             dan, stepdan, nfft, count, limit, dtime 
+             dan, stepdan, nfft, count, limit, dtime, setParamFFT 
     end
     
     methods
-         function obj =  MyFFT01(dtime, danx, stepdanx, nfftx, limit)
+         function obj =  MyFFT01(dtime, danx, setparamfft)
+             obj.setParamFFT = setparamfft;
              obj.dtime = dtime;
              obj.dan = danx;
-             obj.stepdan = stepdanx;
-             obj.nfft = nfftx;
              obj.count =  length(obj.dan);
-             if exist('limit')>0
-                 obj.limit = limit;
-             else
-                 obj.limit = fix(nfftx/2);
+
+             if obj.setParamFFT.limit == 0
+                 obj.setParamFFT.limit = fix(obj.setParamFFT.nfft /2);
              end
          end        
 % ----------     OneStep   --------------------------------    
@@ -22,19 +20,19 @@ classdef MyFFT01  < handle
                   deltai=obj.count;
             end
               
-            if deltai-obj.nfft <1
-                  Y0=zeros(1,obj.limit);
+            if deltai-obj.setParamFFT.nfft <1
+                  Y0=zeros(1, obj.setParamFFT.limit);
                   return
             end
             
-              Y = abs(fft(obj.dan(deltai-obj.nfft : deltai)));
-              Y0=Y(1:obj.limit);
+              Y = abs(fft(obj.dan(deltai-obj.setParamFFT.nfft : deltai)));
+              Y0=Y(1:obj.setParamFFT.limit);
          end
           
 % ----------     AllFFT   --------------------------------    
          function z =  AllFFT(obj)
-            z = zeros(obj.count, obj.limit);   
-            for i = obj.nfft+1 :obj.count
+            z = zeros(obj.count, obj.setParamFFT.limit);   
+            for i = obj.setParamFFT.nfft+1 :obj.count
                 z(i, :) = obj.OneStep(i);
             end
          end

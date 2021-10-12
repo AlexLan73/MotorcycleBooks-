@@ -17,11 +17,7 @@ if isempty(Hd)
     
     h = fdesign.highpass('fst,fp,ast,ap', Fstop, Fpass, Astop, Apass, Fs);
     
-    Hd = design(h, 'equiripple', ...
-        'MinOrder', 'any', ...
-        'StopbandShape', 'flat');
-    
-    
+    Hd = design(h, 'equiripple', 'MinOrder', 'any',  'StopbandShape', 'flat');
     
     set(Hd,'PersistentMemory',true);
     

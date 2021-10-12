@@ -2,6 +2,7 @@ classdef LoadDan  < handle
     
     properties
         XYZ, XYZg, Engine, Frc, muRoad, Speed, Time, vBelt
+%        D
     end
     
     
@@ -18,13 +19,23 @@ classdef LoadDan  < handle
                 obj.Speed = DanConvert.speed;
                 obj.Time = DanConvert.Time;
                 obj.vBelt = DanConvert.vBelt;
+%                obj.D = struct('X',  obj.XYZ.X, 'Y',  obj.XYZ.Y, 'Z',  obj.XYZ.Z, 'PitchVel', obj.XYZg.PitchVel, 'RollVel', obj.XYZg.RollVel,  'YawVel', obj.XYZg.YawVel, 'YawAcc', obj.XYZg.YawAcc);
+%testDan.Engine(["Engine.Trq", "Engine.Rotv"]);                
             else
                 disp(" Not file "+pathfile)
             end
-            
-            
          end        
         
+%          function z=Get(obj, name)
+%              disp(name)
+%             try
+%                z=obj.D.(name)
+%             catch exception
+%              disp("error  ")
+%                 
+%                z=zeros(length( obj.Time), 1)
+%             end                 
+%          end
         
     end
     

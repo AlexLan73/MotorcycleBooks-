@@ -1,31 +1,18 @@
 classdef AnalysisDan  < handle
     properties
-        Dan,  verMatlab, nametitle
+        Dan,   setParamInfo
     end
     
     properties (SetAccess = private)
-        k1, k2
     end
     
     methods
-        function obj =  AnalysisDan(dan, nametitle,  vermatlab)
+        function obj =  AnalysisDan(dan, setparaminfo)
+            obj.setParamInfo  =  setparaminfo;    
             obj.Dan = dan;
-            obj.nametitle = nametitle;
-            if exist('nametitle')>0
-                             obj.nametitle = nametitle;
-                         else
-                             obj.nametitle = "";
-            end
-            
-            if exist('vermatlab')>0
-                             obj.verMatlab = 1;     % старый вариант
-                         else
-                             obj.verMatlab = 0;     % новый вариант
-            end
-            
         end
         
-        % ---  function   XYZ      
+        % ---  function   XYZ      +
         function  PlotXYZ(obj, names)
             if exist('names')>0     % выборочно
                     nCount=length(names);
@@ -55,15 +42,11 @@ classdef AnalysisDan  < handle
                     names=["X", "Y", "Z" ];
             end
 
-            if obj.verMatlab >0
-                plot1 = MyPlot(obj.Dan.Time, m, names, obj.nametitle, "old") ;                            
-            else
-                plot1 = MyPlot(obj.Dan.Time, m, names, obj.nametitle);                             
-           end
-           plot1.AllPlot()
+            plot1 = MyPlot(obj.Dan.Time, m, names, obj.setParamInfo) ;                            
+            plot1.AllPlot()
         end
         
-        % ---  function   XYZg      
+        % ---  function   XYZg      +
         function  PlotXYZg(obj, names)
             if exist('names')>0     % выборочно
                     nCount=length(names);
@@ -97,19 +80,39 @@ classdef AnalysisDan  < handle
                     names=["PitchVel", "RollVel", "YawVel", "YawAcc"];
             end
 
-            if obj.verMatlab >0
-                plot1 = MyPlot(obj.Dan.Time, m, names, obj.nametitle, "old") ;                            
-            else
-                plot1 = MyPlot(obj.Dan.Time, m, names, obj.nametitle );                             
-           end
-           plot1.AllPlot()
+
+            plot1 = MyPlot(obj.Dan.Time, m, names, obj.setParamInfo) ;                            
+            plot1.AllPlot()
         end
         
-        
-        
-        
-        % ---  function   Engine      
+        % ---  function   Engine      +
         function  Engine(obj, names)
+            if exist('names')>0     % выборочно
+                    nCount=length(names);
+                    m = zeros(nCount, length(obj.Dan.Time));
+                    for i=1:nCount
+                        switch names(i)
+                            case "Engine.Trq" 
+                                disp("Engine.Trq")
+                                m(i,:) = obj.Dan.Engine.Trq;
+                            case "Engine.Rotv" 
+                                disp("Engine.Rotv")
+                                m(i,:) = obj.Dan.Engine.Rotv;
+                            otherwise
+                                disp('not field!')
+                        end
+                        
+                    end
+                    
+            else  %  ¬се
+                    m = zeros(2, length(obj.Dan.Time));
+                    m(1,:) = obj.Dan.Engine.Trq;
+                    m(2,:) = obj.Dan.Engine.Rotv;
+                    names=["Engine.Trq", "Engine.Rotv"];
+            end
+
+            plot1 = MyPlot(obj.Dan.Time, m, names, obj.setParamInfo) ;                            
+            plot1.AllPlot()
         end
 
         % ---  function   Frc      
@@ -118,6 +121,32 @@ classdef AnalysisDan  < handle
 
         % ---  function   muRoad      
         function  muRoad(obj, names)
+            if exist('names')>0     % выборочно
+                    nCount=length(names);
+                    m = zeros(nCount, length(obj.Dan.Time));
+                    for i=1:nCount
+                        switch names(i)
+                            case "muRoad.F" 
+                                disp("muRoad.F")
+                                m(i,:) = obj.Dan.muRoad.F;
+                            case "muRoad.R"
+                                disp("muRoad.R")
+                                m(i,:) = obj.Dan.muRoad.R;
+                            otherwise
+                                disp('not field!')
+                                return;
+                        end
+                    end
+            else  %  ¬се
+                    m = zeros(2, length(obj.Dan.Time));
+                    m(1,:) = obj.Dan.muRoad.F;
+                    m(2,:) = obj.Dan.muRoad.R;
+                    names=["muRoad.F", "muRoad.R"];
+            end
+
+            plot1 = MyPlot(obj.Dan.Time, m, names, obj.setParamInfo) ;                            
+            plot1.AllPlot()
+            
         end
 
         % ---  function   speed     
@@ -131,9 +160,6 @@ classdef AnalysisDan  < handle
         % ---  function   vBelt
         function zOut = Spectrum(obj, names, setparam)
             zOut = cell(1,1);
-            step = setparam.step
-            nfft = setparam.nfft
-            limit = setparam.limit
             disp("  -- spectrum  from data:")
             T=[];
             TT=obj.Dan.Time;
@@ -159,31 +185,31 @@ classdef AnalysisDan  < handle
                                 
                             otherwise
                                 disp('not field!')
+                                return
                 end
-                fftx = MyFFT01(TT, T, setparam.step, setparam.nfft, setparam.limit);             
+                fftx = MyFFT01(TT, T, setparam);             
                 [e,z] = fftx.AllFFTe();   
                 figure
                 mesh(z)                
-                title(" spectrum "+obj.nametitle+"   "+ ss)
+                title(" spectrum " + obj.setParamInfo.Title + "   "+ ss)
                 figure
                 plot(e)
-                title(" energy "+obj.nametitle+"   "+  ss)
-                d.name=ss;
-                d.z=z;
-                d.e=e;
-                zOut{i,1}=d;
+                title(" energy " + obj.setParamInfo.Title  + "   "+  ss)
+                zOut{i,1}= struct('name',  ss, 'z', z, 'e', e);   
             end
         end
-    
-%z=cell(1,1);
-%for i=1:length(danfiles)
-%    dddz.ind=i;
-%    dddz.name=danfiles(i);
-%    z{i,1}=dddz;
-%end
 
-
-
+         function z=Get(obj, name)
+             disp(name)
+            try
+               z=obj.D.(name)
+            catch exception
+             disp("error  ")
+               z=zeros(length( obj.Time), 1)
+            end                 
+         end
+        
+        
     end
     
 end
