@@ -4,6 +4,7 @@ classdef AnalysisDan1  <  handle
         setParamInfo, setparam_sp
         Dan LoadDan1 
         MyF MFilter
+        plot2021
     end
     
     properties (SetAccess = private)
@@ -14,6 +15,7 @@ classdef AnalysisDan1  <  handle
             obj.setParamInfo  =  setparaminfo;    
             obj.Dan =  LoadDan1(setpathx.Dir, setpathx.Files);
             obj.MyF = MFilter();
+            obj.plot2021 = Plot2021();
         end
         
         function  PlotXYZ(obj, names)
@@ -82,7 +84,6 @@ classdef AnalysisDan1  <  handle
             end
         end
             
-            
         function  z = Proskal(obj)
             % тест формулы 1-(V/w*R)
             r0 = 25.4*17/1000;
@@ -125,10 +126,8 @@ classdef AnalysisDan1  <  handle
         end
         
         function FiltrSvchChebSpectrum(obj, ticker, titlex)
-            
             %NCount
             d =obj.MyF. FSVCH_Cheb(obj.Dan.Get(ticker));
-           
             obj.myPlotone(d, titlex);
             fftx = MyFFT01(obj.Dan.Time, d, obj.setparam_sp);             
             [e,z] = fftx.AllFFTe();   
@@ -140,6 +139,25 @@ classdef AnalysisDan1  <  handle
             title(" energy " + obj.setParamInfo.Title  + "   "+  titlex)
         end
         
+        function PlotSignal2021(obj, nameSignal)
+            i=1;
+            mm=cell(1,1);
+            mm{1,1}=struct('mas', obj.Dan.Get(nameSignal), 'title', nameSignal);
+            if nameSignal ~= 'YawAcc'
+                nextFiltr =FNChEleps(mm{1,1}.mas)*10;
+                mm{2,1}=struct('mas', nextFiltr, 'title', " - filtr "+nameSignal);
+                fftx = MyFFT01(obj.Dan.Time, nextFiltr, obj.setparam_sp);             
+                i=3;
+            else
+                fftx = MyFFT01(obj.Dan.Time, mm{1,1}.mas, obj.setparam_sp);             
+                i=2;
+            end
+            [e,z] = fftx.AllFFTe();   
+            mm{i,1}=struct('mas', z, 'title', " - spectr "+nameSignal);
+            i=i+1;
+            mm{i,1}=struct('mas', e', 'title', " - energya spectra "+nameSignal);
+            obj.plot2021.PlotVertical(mm);
+        end
     end
     
 end
