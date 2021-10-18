@@ -5,11 +5,12 @@ classdef MFilter  < handle
     
     methods
         function obj = MFilter()
-            obj.SetSVCH_Cheb(struct('Fstop',  0.4, 'Fpass',  0.8, 'Astop', 40, 'Apass', 0.9));
+            x =struct('Fstop',  0.4, 'Fpass',  0.8, 'Astop', 40, 'Apass', 0.9);
+            obj.SetFNCH_Cheb(x);
             
         end
         
-        function SetSVCH_Cheb(obj, x)
+        function SetFNCH_Cheb(obj, x)
 %                 Fstop        % Stopband Frequency
 %                 Fpass = setparamsxxx.Fpass;       % Passband Frequency
 %                 Astop = setparamsxxx.Astop;        % Stopband Attenuation (dB)
@@ -19,6 +20,7 @@ classdef MFilter  < handle
             h = fdesign.highpass('fst,fp,ast,ap', x.Fstop, x.Fpass, x.Astop, x.Apass, 100);
             obj.Hd_svchCheb = design(h, 'equiripple', 'MinOrder', 'any',  'StopbandShape', 'flat');
             set(obj.Hd_svchCheb, 'PersistentMemory', true);
+            
         end
         
         function y= FSVCH_Cheb(obj, x)

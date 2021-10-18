@@ -87,7 +87,8 @@ classdef AnalysisDan1  <  handle
             % тест формулы 1-(V/w*R)
             r0 = 25.4*17/1000;
             %V = DanConvert.speed;
-            V =  obj.Dan.Get("vBelt.R");           %DanConvert.vBelt.F;
+%            V =  obj.Dan.Get("vBelt.R");           %DanConvert.vBelt.F;
+            V =  obj.Dan.Get("Speed");           %DanConvert.vBelt.F;
             kp=3;
             %w0=2*pi*f
             vr=r0/kp* obj.Dan.Get("Engine.Rotv");       %DanConvert.Engine.Rotv;
@@ -108,6 +109,7 @@ classdef AnalysisDan1  <  handle
         function myPlotone(obj, d, name)
             figure
             plot(d)
+            grid()
             title(name)            
         end
         
@@ -126,9 +128,7 @@ classdef AnalysisDan1  <  handle
         
         function FiltrSvchChebSpectrum(obj, ticker, titlex)
             
-            %NCount
             d =obj.MyF. FSVCH_Cheb(obj.Dan.Get(ticker));
-           
             obj.myPlotone(d, titlex);
             fftx = MyFFT01(obj.Dan.Time, d, obj.setparam_sp);             
             [e,z] = fftx.AllFFTe();   
@@ -139,7 +139,25 @@ classdef AnalysisDan1  <  handle
             plot(e)
             title(" energy " + obj.setParamInfo.Title  + "   "+  titlex)
         end
+
+        function z = dSpeed(obj, step)
+            z = zeros(obj.Dan.NCount, 1);
+            v = obj.Dan.Get("vBelt.R");
+            
+            for i=step+1:obj.Dan.NCount
+                if v(i)-v(i-step)>0
+                    z(i,1)=1;
+                else
+                    z(i,1)=-1;
+                end
+            end
+            obj.myPlotone(z, " Ускорение/торможение");
+        end
         
+        function z = fStd(obj, v)
+            obj.Dan.NCount
+            %!!!!!!!!!!!!!!
+        end
     end
     
 end
